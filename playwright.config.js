@@ -8,14 +8,14 @@ import { defineConfig, devices } from '@playwright/test';
  */
 const config = ({
   testDir: './tests',
-  timeout: 40000,
+  timeout: 5000,
   expect:
   {
-    timeout: 40000
+    timeout: 5000
   },
   reporter: 'html',
   use: {
-    browserName: 'webkit',
+    browserName: 'chromium',
     headless: false
   }
 });

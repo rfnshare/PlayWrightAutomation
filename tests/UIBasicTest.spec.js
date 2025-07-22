@@ -68,7 +68,9 @@ test.only("Third Playwright Test", async ({page})=>
    await userPassword.fill("Rfns@0000");
    await confirmBtn.click();
 
-   console.log(await page.locator("[class='card-body'] b").first().textContent());
+   //console.log(await page.locator("[class='card-body'] b").first().textContent());
+   //await page.waitForLoadState('networkidle'); // network level wait
+   await page.locator("[class='card-body'] b").first().waitFor(); // element level wait
    console.log(await page.locator("[class='card-body'] b").allTextContents());
-   console.log(await email);
+   console.log(email);
 });

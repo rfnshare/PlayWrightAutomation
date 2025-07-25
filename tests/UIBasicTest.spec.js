@@ -100,7 +100,7 @@ test('UI Control Testing', async ({page})=>
     // await signIn.click();
 });
 
-test.only("Child Window", async ({browser})=>
+test("Child Window", async ({browser})=>
 {
     const context = await browser.newContext();
     const page = await context.newPage();

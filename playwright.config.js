@@ -16,7 +16,9 @@ const config = ({
   reporter: 'html',
   use: {
     browserName: 'chromium',
-    headless: true
+    headless: true,
+    screenshot: 'on',
+    trace: 'retain-on-failure',
   }
 });
 module.exports = config

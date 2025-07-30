@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { exitCode } from "process";
 
 test.only("E2E Test", async ({ page }) => {
   // Domain URL
@@ -75,17 +76,21 @@ test.only("E2E Test", async ({ page }) => {
   // ------------------Add To Cart Flow-------------------------
   const productCount = await productCardBody.count();
   console.log(`✅ Product Count: ${productCount}`);
-  for (let i=0; i<productCount; ++i)
-  {
-    const productTitle = await productCardBody.nth(i).locator("h5").textContent();
-    if (productTitle==productName)
-    {
-        await productCardBody.nth(i).locator("button[class='btn w-10 rounded']").click();
-        break;
+  for (let i = 0; i < productCount; ++i) {
+    const productTitle = await productCardBody
+      .nth(i)
+      .locator("h5")
+      .textContent();
+    if (productTitle == productName) {
+      await productCardBody
+        .nth(i)
+        .locator("button[class='btn w-10 rounded']")
+        .click();
+      break;
     }
   }
   await cartBtn.click();
-  
+
   // ------------------Cart Page Flow-------------------------
   const cartPageProductName = await cartPageProductNameLoc.textContent();
   console.log(`🛒 Cart Page Product Name: ${cartPageProductName}`);
@@ -97,19 +102,71 @@ test.only("E2E Test", async ({ page }) => {
   expect(bool).toBeTruthy();
 
   // ------------------Checkout Page Flow-------------------------
+  const country = "Bangladesh";
   await page.locator("button[type='button']").last().click(); // Click Checkout Button
-  await page.locator("[placeholder='Select Country']").pressSequentially("Ban", {delay:100});
+  await page
+    .locator("[placeholder='Select Country']")
+    .pressSequentially("Ban", { delay: 100 });
   const dropdown = page.locator("[class*='ta-results']");
   await dropdown.waitFor();
-  for (let i=0; i<await dropdown.locator("button").count(); ++i)
-  {
+  for (let i = 0; i < (await dropdown.locator("button").count()); ++i) {
     const nameOfCountry = await dropdown.locator("button").nth(i).textContent();
-    console.log(`🧾 Country Name: ->${nameOfCountry}<-`);
-    if (nameOfCountry.trim()=="Bangladesh")
-    {
+    if (nameOfCountry.trim() == country) {
       await dropdown.locator("button").nth(i).click();
       break;
     }
   }
-  await page.pause();
+  //
+  const checkoutPageEmail = await page
+    .locator("div[class*='user__name '] label")
+    .textContent();
+  expect(checkoutPageEmail).toBe(email);
+  expect(page.locator("div[class*='user__name '] label")).toHaveText(email); //Another way to validate
+
+  // ------------------Confirmed Order Page Flow-------------------------
+  await page.locator("a[class*='action__submit']").click();
+  const confirmMsg = await page.locator(".hero-primary").textContent();
+  expect(confirmMsg).toBe(" Thankyou for the order. ");
+  const orderId = await page
+    .locator("label[class='ng-star-inserted']")
+    .textContent();
+  const arrayOrder = orderId.trim().split(" ");
+  const cleanOrderId = arrayOrder[1];
+  console.log(`✔ Order Id: ${cleanOrderId}`);
+
+  // ----------------- Order Page Flow-------------------------
+  await page.locator("button[routerlink='/dashboard/myorders']").click();
+  await page
+    .locator(
+      `//th[text()='${cleanOrderId}']/parent::tr//button[@class='btn btn-primary']`
+    )
+    .click();
+
+  // Validating Order Contents
+  const dashboardOrderId = await page
+    .locator("[class='col-text -main']")
+    .textContent();
+  const BillinguserMailAndCountry = page.locator(
+    "//div[@class='content-title' and contains(text(), 'Billing')]//parent::div//p"
+  );
+  const BillinguserMail = await BillinguserMailAndCountry.first().textContent();
+  const BillinguserCountry = await BillinguserMailAndCountry.last().textContent();
+  const DeiveryuserMailAndCountry = page.locator(
+    "//div[@class='content-title' and contains(text(), 'Delivery')]//parent::div//p"
+  );
+  const DeiveryuserMail = await DeiveryuserMailAndCountry.first().textContent();
+  const DeiveryuserCountry = await DeiveryuserMailAndCountry.last().textContent();
+  const dashboardProductName = await page
+    .locator("div[class='title']")
+    .textContent();
+
+  expect(dashboardOrderId).toBe(cleanOrderId);
+
+  expect(BillinguserMail?.trim()).toBe(email);
+  expect(BillinguserCountry).toContain(country);
+
+  expect(DeiveryuserMail?.trim()).toBe(email);
+  expect(DeiveryuserCountry).toContain(country);
+
+  expect(dashboardProductName?.trim()).toBe(productName);
 });

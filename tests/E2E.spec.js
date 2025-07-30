@@ -75,7 +75,6 @@ test.only("E2E Test", async ({ page }) => {
   // ------------------Add To Cart Flow-------------------------
   const productCount = await productCardBody.count();
   console.log(`✅ Product Count: ${productCount}`);
-  await page.pause();
   for (let i=0; i<productCount; ++i)
   {
     const productTitle = await productCardBody.nth(i).locator("h5").textContent();
@@ -96,4 +95,21 @@ test.only("E2E Test", async ({ page }) => {
   await page.locator("li[class*=items]").waitFor();
   const bool = await page.locator(`h3:has-text("${productName}")`).isVisible();
   expect(bool).toBeTruthy();
+
+  // ------------------Checkout Page Flow-------------------------
+  await page.locator("button[type='button']").last().click(); // Click Checkout Button
+  await page.locator("[placeholder='Select Country']").pressSequentially("Ban", {delay:100});
+  const dropdown = page.locator("[class*='ta-results']");
+  await dropdown.waitFor();
+  for (let i=0; i<await dropdown.locator("button").count(); ++i)
+  {
+    const nameOfCountry = await dropdown.locator("button").nth(i).textContent();
+    console.log(`🧾 Country Name: ->${nameOfCountry}<-`);
+    if (nameOfCountry.trim()=="Bangladesh")
+    {
+      await dropdown.locator("button").nth(i).click();
+      break;
+    }
+  }
+  await page.pause();
 });

@@ -13,7 +13,7 @@ test('PlayWright Special Locators', async ({page})=>
     await page.pause();
 })
 
-test.only('PlayWright Locator Handle Two', async ({page})=>
+test('PlayWright Locator Handle Two', async ({page})=>
 {
     await page.goto("https://rahulshettyacademy.com/seleniumPractise/#/");
     await page.locator("[class='product']").filter({hasText: 'Cucumber - 1 Kg'}).getByRole("button").click();
@@ -23,6 +23,30 @@ test.only('PlayWright Locator Handle Two', async ({page})=>
     await page.getByRole("combobox").selectOption("Bangladesh");
     await page.getByRole("checkbox").click();
     await page.getByRole("button").click();
+    await page.pause();
+
+
+})
+
+test.only('PlayWright Calender Handle', async ({page})=>
+{
+    const year = "2027";
+    const month = "June";
+    const day = "9"
+    const expectedList = ["6", day, year]
+    await page.goto("https://rahulshettyacademy.com/seleniumPractise/#/offers");
+    await page.locator("button[class*='react-date-picker__calendar-button']").click(); 
+    await page.locator("button[class*='react-calendar__navigation__label']").click();
+    await page.locator("button[class*='react-calendar__navigation__label']").click();
+    await page.getByText(`${year}`).click();
+    await page.locator("button[class*='react-calendar__year-view__months__month']").nth("5").click();
+    await page.locator(`[aria-label='${month} ${day}, ${year}']`).click();
+    const inputs = page.locator("input[class*='react-date-picker__inputGroup__input']");
+    for (let index=0; index <inputs.length; index++)
+    {
+        const value = await inputs.nth(index).getAttribute("value");
+        expect(value).toBe(expectedList[index]);
+    }
     await page.pause();
 
 

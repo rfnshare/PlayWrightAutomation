@@ -12,3 +12,18 @@ test('PlayWright Special Locators', async ({page})=>
     await page.locator("app-card").filter({hasText: 'Nokia Edge'}).getByRole("button").click();
     await page.pause();
 })
+
+test.only('PlayWright Locator Handle Two', async ({page})=>
+{
+    await page.goto("https://rahulshettyacademy.com/seleniumPractise/#/");
+    await page.locator("[class='product']").filter({hasText: 'Cucumber - 1 Kg'}).getByRole("button").click();
+    await page.locator("[class='cart-icon']").click();
+    await page.getByRole("button", {name: 'PROCEED TO CHECKOUT'}).click();
+    await page.getByRole("button", {name: 'Place Order'}).click();
+    await page.getByRole("combobox").selectOption("Bangladesh");
+    await page.getByRole("checkbox").click();
+    await page.getByRole("button").click();
+    await page.pause();
+
+
+})

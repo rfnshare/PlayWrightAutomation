@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { exitCode } from "process";
 
-test.only("E2E Test", async ({ page }) => {
+test("E2E Test", async ({ page }) => {
   // Domain URL
   const domainURL = "https://rahulshettyacademy.com/client";
 
